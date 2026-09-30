@@ -1,0 +1,62 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import requests
+import io
+
+url = "https://raw.githubusercontent.com/Prodigy-InfoTech/data-science-datasets/main/Task%201/API_SP.POP.TOTL_DS2_en_csv_v2_38144.csv"
+
+response = requests.get(url)
+
+if response.status_code == 200:
+
+    data = pd.read_csv(io.BytesIO(response.content), skiprows=4)
+
+    print("Dataset loaded successfully!")
+    print("Dataset Shape:", data.shape)
+    display(data.head())
+
+    data = data.dropna(subset=["2022"])
+
+    # ---------------- BAR CHART ----------------
+
+    top_10 = data.sort_values(
+        by="2022",
+        ascending=False
+    ).head(10)
+
+    plt.figure(figsize=(12, 6))
+
+    plt.bar(
+        top_10["Country Name"],
+        top_10["2022"]
+    )
+
+    plt.title("Population Distribution - Top 10 Countries")
+    plt.xlabel("Country")
+    plt.ylabel("Population")
+    plt.xticks(rotation=45)
+
+    plt.tight_layout()
+    plt.show()
+
+
+    # ---------------- HISTOGRAM ----------------
+
+    plt.figure(figsize=(10, 6))
+
+    plt.hist(
+        data["2022"],
+        bins=20,
+        edgecolor="black"
+    )
+
+    plt.title("Population Distribution Histogram")
+    plt.xlabel("Population")
+    plt.ylabel("Number of Countries")
+
+    plt.tight_layout()
+    plt.show()
+
+else:
+    print("Dataset could not be downloaded.")
+    print("Status Code:", response.status_code)
